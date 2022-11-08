@@ -24,4 +24,4 @@ COPY        ./script.sh /
 
 RUN         chmod +x /script.sh
 
-ENTRYPOINT  ["/bin/sh", "-c", "/script.sh"]
+ENTRYPOINT  ["/bin/sh", "-c", "/conf/script.sh"]
