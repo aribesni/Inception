@@ -20,8 +20,8 @@ RUN         apt-get install mariadb-server -y
 
 COPY        conf/50-server.cnf  etc/mysql/mariadb.conf.d/50-server.cnf
 
-COPY        ./script.sh /
+COPY        ./conf/script.sh ./
 
 RUN         chmod +x /script.sh
 
-ENTRYPOINT  ["/bin/sh", "-c", "/conf/script.sh"]
+ENTRYPOINT  ["/bin/sh", "-c", "./script.sh"]

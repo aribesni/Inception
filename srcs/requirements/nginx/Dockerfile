@@ -32,7 +32,7 @@ RUN     openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/
 
 RUN     mkdir -p /var/run/nginx
 
-COPY    conf/default /etc/nginx/sites-enabled/default
+COPY    ./conf/default /etc/nginx/sites-enabled/default
 
 RUN     chmod 755 /var/www/html
 
