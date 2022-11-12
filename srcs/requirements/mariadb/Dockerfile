@@ -10,18 +10,28 @@
 #                                                                              #
 # **************************************************************************** #
 
-FROM        debian:buster
+FROM    debian:buster
 
-RUN         apt update -y
+EXPOSE  3306
 
-RUN         apt upgrade -y
+RUN     apt-get update -y
+RUN     apt-get install -y mariadb-server gettext-base
 
-RUN         apt-get install mariadb-server -y
+COPY    ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY    ./conf/db.sql /var/www/db.sql
 
-COPY        conf/50-server.cnf  etc/mysql/mariadb.conf.d/50-server.cnf
+# ARG     _DB_ADMIN_LOGIN=${_DB_ADMIN_LOGIN}
+# ARG     _DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD}
+# ARG     _DB_ROOT_PASSWD=${_DB_ROOT_PASSWD}
 
-COPY        ./conf/script.sh ./
+# RUN     DB_ADMIN_LOGIN=$_DB_ADMIN_LOGIN \
+# 	    DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD} \
+#  	    DB_ROOT_PASSWD=${_DB_ROOT_PASSWD} \
+# 	    envsubst < /var/www/db.sql > /var/www/interpreted_db.sql
 
-RUN         chmod +x /script.sh
+RUN     service mysql start; \
+	    mysql -u root < /var/www/db.sql \
+	    && rm -f /var/www/db.sql
+	    # && rm -f /var/www/interpreted_db.sql;
 
-ENTRYPOINT  ["/bin/sh", "-c", "./script.sh"]
+CMD     [ "mysqld" ]

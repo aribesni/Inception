@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-version: '3'
+version: '3.9'
 
 services:
   mariadb:
@@ -45,7 +45,7 @@ services:
       - "4430:4430"
     restart: on-failure
   
-  worpdress:
+  wordpress:
     image: wordpress
     container_name: wordpress
     volumes:
@@ -68,13 +68,13 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/Users/aribesni/data/wordpress'
+      device: '/host_mnt/Users/aristidebesnier/Documents/42/Inception/volumes/wordpress'
   mariadb:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/Users/aribesni/data/mariadb'
+      device: '/host_mnt/Users/aristidebesnier/Documents/42/Inception/volumes/mariadb'
 
 networks:
   inception:

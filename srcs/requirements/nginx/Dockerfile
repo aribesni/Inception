@@ -28,14 +28,14 @@ RUN     mkdir -p /etc/nginx/ssl
 
 RUN     apt-get install openssl -y
 
-RUN     openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=aribesni.42.fr/UID=aribesni"
+RUN     openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=aribesni.42.fr/UID=aribesni"
 
-RUN     mkdir -p /var/run/nginx
+# RUN     mkdir -p /var/run/nginx
 
 COPY    ./conf/default /etc/nginx/sites-enabled/default
 
-RUN     chmod 755 /var/www/html
+# RUN     chmod 755 /var/www/wordpress
 
-RUN     chown -R www-data:www-data /var/www/html
+# RUN     chown -R www-data:www-data /var/www/wordpress
 
-CMD     ["nginx", "-g", "daemon off;"]
+CMD     [ "nginx", "-g", "daemon off;" ]
