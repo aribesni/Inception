@@ -1,88 +1,69 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    docker-compose.yml                                 :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: aribesni <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/11/04 13:07:48 by aribesni          #+#    #+#              #
-#    Updated: 2022/11/04 13:07:50 by aribesni         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-version: '3.9'
-
-services:
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    networks:
-      - inception
-    build:
-      context: requirements/mariadb
-      dockerfile: Dockerfile
-      args:
-          _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-          _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
-          _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
-    env_file: .env
-    volumes:
-      - mariadb:/var/lib/mysql
-    restart: on-failure
-    expose:
-      - "3306"
-
-  nginx:
-    image: nginx
-    container_name: nginx
-    volumes:
-      - wordpress:/var/www/wordpress
-    networks:
-      - inception
-    depends_on:
-      - wordpress
-    build:
-      context: requirements/nginx
-      dockerfile: Dockerfile
-    env_file: .env
-    ports:
-      - "4430:4430"
-    restart: on-failure
-  
-  wordpress:
-    image: wordpress
-    container_name: wordpress
-    volumes:
-      - wordpress:/var/www/wordpress
-    networks:
-      - inception
-    build:
-      context: requirements/wordpress
-      dockerfile: Dockerfile
-      args:
-          _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-          _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
-    env_file: .env
-    depends_on:
-      - mariadb
-    restart: on-failure
-    expose:
-      - "9000"
+version: "3.5"
 
 volumes:
-  wordpress:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/host_mnt/Users/aristidebesnier/Documents/42/Inception/volumes/wordpress'
-  mariadb:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: '/host_mnt/Users/aristidebesnier/Documents/42/Inception/volumes/mariadb'
+    wp:
+        driver: local
+        driver_opts:
+            type:
+                none
+            device: /Users/aristidebesnier/data/wp
+            o: bind
+    db:
+        driver: local
+        driver_opts:
+            type:
+                none
+            device: /Users/aristidebesnier/data/db
+            o: bind
 
 networks:
-  inception:
-    driver: bridge
+    inception:
+        driver: bridge
+
+services:
+    mariadb:
+        container_name: mariadb
+        env_file:
+            - .env
+        build:
+            context: requirements/mariadb/
+            args:
+                _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+                _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
+                _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
+        networks:
+            - inception
+        volumes:
+            - db:/var/lib/mysql
+        restart: unless-stopped
+
+    wordpress:
+        container_name: wordpress
+        build:
+            context: requirements/wordpress/
+            args:
+                _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+                _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
+        networks:
+            - inception
+        volumes:
+            - wp:/var/www/html
+        env_file:
+            - .env
+        restart: unless-stopped
+        depends_on:
+            - mariadb
+    nginx:
+        container_name: nginx
+        build: requirements/nginx
+        ports:
+            - "443:443"
+        networks:
+            - inception
+        volumes:
+            - wp:/var/www/html
+        env_file:
+            - .env
+        restart: unless-stopped
+        depends_on:
+            - wordpress
