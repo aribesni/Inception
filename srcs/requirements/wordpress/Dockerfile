@@ -18,7 +18,7 @@ RUN         apt-get upgrade -y
 
 RUN         apt-get -y install wget
 
-RUN         apt-get install -y php7.3 php-fpm php-mysqli
+RUN         apt-get install -y php7.3 php-fpm php-mysqli gettext-base
 
 EXPOSE      9000
 
@@ -28,7 +28,17 @@ COPY        ./conf/auto-config.sh /var/www/
 
 RUN         chmod +x /var/www/auto-config.sh
 
-COPY        ./conf/wp-config.php /var/www/wp-config.php
+# COPY        ./conf/wp-config.php /var/www/wp-config.php
+
+COPY ./conf/wp-config.php /var/www/wp-config.php.tmp
+
+ARG _DB_ADMIN_LOGIN=${_DB_ADMIN_LOGIN}
+ARG _DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD}
+
+RUN DB_ADMIN_LOGIN=$_DB_ADMIN_LOGIN \
+	DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD} \
+	envsubst '$$DB_ADMIN_LOGIN $$DB_ADMIN_PASSWD' < /var/www/wp-config.php.tmp > /var/www/wp-config.php
+RUN rm -f /var/www/wp-config.php.tmp
 
 ENTRYPOINT  [ "/var/www/auto-config.sh" ]
 

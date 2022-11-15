@@ -16,11 +16,13 @@
 # include /etc/nginx/modules-enabled/*.conf;
 
 # events {
-# 	worker_connections 768;
-# 	multi_accept on;
+	# worker_connections 768;
+	# multi_accept on;
 # }
 
 # http {
+
+	include /etc/nginx/mime.types;
 	##
 	# Basic Settings
 	##
@@ -73,10 +75,13 @@
 	# include /etc/nginx/sites-enabled/*;
 
 	server {
+		listen [::]:4430 ssl;
 		listen 4430 ssl;
 		ssl_protocols TLSv1.2 TLSv1.3;
 		ssl_certificate /etc/nginx/ssl/inception.crt;
 		ssl_certificate_key /etc/nginx/ssl/inception.key;
+		
+		ssl on;
 
 		root  /var/www/wordpress;
 		server_name localhost
@@ -88,6 +93,10 @@
 		location ~ \.php$ {
 			include snippets/fastcgi-php.conf;
 			fastcgi_pass wordpress:9000;
+			# fastcgi_index	index.php;
+			# include			fastcgi_params;
+			# fastcgi_param	SCRIPT_FILENAME		$document_root$fastcgi_script_name;
+			# fastcgi_param	SCRIPT_NAME			$fastcgi_script_name;
 		}
 	}
 # }

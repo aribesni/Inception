@@ -21,6 +21,10 @@ services:
     build:
       context: requirements/mariadb
       dockerfile: Dockerfile
+      args:
+          _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+          _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
+          _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
     env_file: .env
     volumes:
       - mariadb:/var/lib/mysql
@@ -55,6 +59,9 @@ services:
     build:
       context: requirements/wordpress
       dockerfile: Dockerfile
+      args:
+          _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+          _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
     env_file: .env
     depends_on:
       - mariadb
