@@ -6,14 +6,14 @@ volumes:
         driver_opts:
             type:
                 none
-            device: /Users/aristidebesnier/data/wp
+            device: /home/aribesni/data/wp
             o: bind
     db:
         driver: local
         driver_opts:
             type:
                 none
-            device: /Users/aristidebesnier/data/db
+            device: /home/aribesni/data/db
             o: bind
 
 networks:
@@ -27,10 +27,10 @@ services:
             - .env
         build:
             context: requirements/mariadb/
-            args:
-                _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-                _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
-                _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
+              #args:
+              # _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+              # _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
+              # _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
         networks:
             - inception
         volumes:
@@ -41,9 +41,9 @@ services:
         container_name: wordpress
         build:
             context: requirements/wordpress/
-            args:
-                _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-                _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
+              #args:
+              # _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
+              # _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
         networks:
             - inception
         volumes:

@@ -21,8 +21,8 @@ down :
 
 clean :		down
 			docker volume rm srcs_wp srcs_db
-			rm -rf ~/data/wp/*
-			rm -rf ~/data/db/*
+			rm -rf /home/aribesni/data/wp/*
+			rm -rf /home/aribesni/data/db/*
 
 fclean :	clean
 			docker system prune -af
