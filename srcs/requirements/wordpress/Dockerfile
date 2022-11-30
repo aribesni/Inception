@@ -1,24 +1,33 @@
-FROM 		debian:buster
+FROM        debian:buster
 
-RUN 		apt-get update
-RUN 		apt-get -y install php7.3 php-mysqli php-fpm wget gettext-base
+EXPOSE      9000
 
-EXPOSE 		9000
+RUN         apt-get update && apt-get upgrade -y
 
-COPY 		./conf/www.conf /etc/php/7.3/fpm/pool.d
-COPY 		./conf/auto-config.sh /var/www/
-COPY 		./conf/wp-config.php /var/www/wp-config.php.tmp
+RUN         apt-get -y install wget
 
-RUN 		chmod +x /var/www/auto-config.sh
+RUN         apt-get install -y php7.3 php-fpm php-mysql mariadb-client
 
-ARG 		_DB_ADMIN_LOGIN=${_DB_ADMIN_LOGIN}
-ARG 		_DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD}
+RUN         apt-get install unzip
 
-RUN 		DB_ADMIN_LOGIN=$_DB_ADMIN_LOGIN \
-			DB_ADMIN_PASSWD=${_DB_ADMIN_PASSWD} \
-			envsubst '$$DB_ADMIN_LOGIN $$DB_ADMIN_PASSWD' < /var/www/wp-config.php.tmp > /var/www/wp-config.php
-RUN 		rm -f /var/www/wp-config.php.tmp
+RUN         wget https://wordpress.org/wordpress-6.0.tar.gz -P /var/www
 
-ENTRYPOINT	["/var/www/auto-config.sh"]
+RUN         cd /var/www && tar -xzf wordpress-6.0.tar.gz && rm wordpress-6.0.tar.gz
 
-CMD 		["/usr/sbin/php-fpm7.3", "--nodaemonize"]
+COPY	    ./conf/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+
+RUN		    chown -R root:root /var/www/wordpress
+
+RUN         wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+RUN         chmod +x wp-cli.phar
+
+RUN         mv wp-cli.phar /usr/local/bin/wp
+
+COPY 		./conf/auto-config.sh ./auto-config.sh
+
+RUN         chmod +x ./auto-config.sh
+
+ENTRYPOINT  ["bash", "auto-config.sh"]
+
+CMD         ["/usr/sbin/php-fpm7.3", "--nodaemonize"]

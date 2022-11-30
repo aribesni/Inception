@@ -1,69 +1,69 @@
-version: "3.5"
+version : '3.5'
 
-volumes:
-    wp:
-        driver: local
-        driver_opts:
-            type:
-                none
-            device: /home/aribesni/data/wp
-            o: bind
-    db:
-        driver: local
-        driver_opts:
-            type:
-                none
-            device: /home/aribesni/data/db
-            o: bind
+services :
+  mariadb :
+    image : mariadb
+    container_name : mariadb
+    volumes :
+      - db:/var/lib/mysql
+    networks :
+      - inception
+    build :
+      context : requirements/mariadb
+      dockerfile : Dockerfile
+    env_file : .env
+    restart : on-failure
+    expose :
+      - "3306"
 
-networks:
-    inception:
-        driver: bridge
+  nginx :
+    image : nginx
+    container_name : nginx
+    volumes :
+      - wp:/var/www/wordpress
+    networks :
+      - inception
+    depends_on :
+      - wordpress
+    build : 
+      context : requirements/nginx
+      dockerfile : Dockerfile
+    env_file : .env
+    ports :
+      - "443:443"
+    restart : on-failure
 
-services:
-    mariadb:
-        container_name: mariadb
-        env_file:
-            - .env
-        build:
-            context: requirements/mariadb/
-              #args:
-              # _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-              # _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
-              # _DB_ROOT_PASSWD: ${_DB_ROOT_PASSWD}
-        networks:
-            - inception
-        volumes:
-            - db:/var/lib/mysql
-        restart: unless-stopped
+  wordpress :
+    image : wordpress
+    container_name : wordpress
+    env_file : .env
+    volumes :
+    - wp:/var/www/wordpress
+    networks :
+      - inception
+    build : 
+      context : requirements/wordpress
+      dockerfile : Dockerfile
+    depends_on :
+      - mariadb
+    restart : on-failure
+    expose : 
+      - "9000"
 
-    wordpress:
-        container_name: wordpress
-        build:
-            context: requirements/wordpress/
-              #args:
-              # _DB_ADMIN_LOGIN: ${_DB_ADMIN_LOGIN}
-              # _DB_ADMIN_PASSWD: ${_DB_ADMIN_PASSWD}
-        networks:
-            - inception
-        volumes:
-            - wp:/var/www/wordpress
-        env_file:
-            - .env
-        restart: unless-stopped
-        depends_on:
-            - mariadb
-    nginx:
-        container_name: nginx
-        build: requirements/nginx
-        ports:
-            - "443:443"
-        networks:
-            - inception
-        volumes:
-            - wp:/var/www/wordpress
-        env_file:
-            - .env
-        restart: unless-stopped
-        depends_on:
-            - wordpress
+volumes :
+  wp :
+    driver : local
+    driver_opts :
+      type : 'none'
+      o : 'bind'
+      device: /Users/aristidebesnier/data/wp
+  db :
+    driver : local
+    driver_opts :
+      type : 'none'
+      o : 'bind'
+      device : /Users/aristidebesnier/data/db
+
+networks :
+    inception :
+      driver : bridge
