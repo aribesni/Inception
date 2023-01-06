@@ -52,13 +52,13 @@ volumes :
     driver_opts :
       type : 'none'
       o : 'bind'
-      device: /Users/aristidebesnier/data/wp
+      device: /home/aribesni/data/wp
   db :
     driver : local
     driver_opts :
       type : 'none'
       o : 'bind'
-      device : /Users/aristidebesnier/data/db
+      device : /home/aribesni/data/db
 
 networks :
     inception :

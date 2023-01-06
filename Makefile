@@ -9,8 +9,8 @@ down :
 			docker-compose -f ./srcs/docker-compose.yml down
 
 clean :		down
-			rm -rf /Users/aristidebesnier/data/wp/*
-			rm -rf /Users/aristidebesnier/data/db/*
+			rm -rf /home/aribesni/data/wp/*
+			rm -rf /home/aribesni/data/db/*
 			docker volume rm srcs_wp srcs_db
 
 fclean :	clean
